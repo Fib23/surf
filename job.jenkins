@@ -1,0 +1,36 @@
+pipeline {
+    agent { label 'agent1' }
+    //agent any
+    stages {
+        stage('Create_log') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'GitSurf', variable: 'SECRET_TEXT')]) {
+                        timeout(time: 10, unit: 'MINUTES') {
+                            // Clone the repository
+                            sh('if [ ! -d "surf" ]; then git clone https://$SECRET_TEXT@github.com/Fib23/surf.git; fi')
+                        }
+                        // Change directory to the cloned repository
+                        dir('surf') {
+                            // Create a log file with the current date
+                            sh('echo "$(date +%G-%m-%d/%H:%M) - PRjob executed" > job.log')
+                            withCredentials([string(credentialsId: 'USER_GMAIL', variable: 'User_Gmail')]) {
+                                sh('git config --global user.email "User_Gmail"')
+                            }
+                            withCredentials([string(credentialsId: 'USER_GITHUB', variable: 'User_Github')]) {
+                                sh('git config --global user.name "$User_Github"')
+                            }	
+                            // Add the log file to git
+                            sh('git add job.log')
+                            // Commit the changes
+                            sh('git commit -m "Add date"')
+                            // Push the changes to the remote repository
+                            sh('git push origin main')
+                    
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
