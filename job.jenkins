@@ -33,4 +33,11 @@ pipeline {
             }
         }
     }
+//    post {
+//        always {
+//            mail to: 'mx@example.com',
+//                subject: "Build ${currentBuild.fullDisplayName}",
+//                body: "The build was ${currentBuild.result}. https://github.com/Fib23/surf"
+//        }
+//    }    
 }
